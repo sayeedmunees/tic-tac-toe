@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <style>
+      :root {
+        --bg1: #69afff;
+        --bg2: #906bff;
+        --x: #7c3aed;
+        --o: #06b6d4;
+      }
+
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(
+          1200px 600px at 50% 10%,
+          var(--bg1),
+          var(--bg2)
+        );
+      }
+      .cell {
+        width: 90px;
+        height: 90px;
+        border: none;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1),
+          0 3px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Permanent Marker", cursive;
+        font-size: 56px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .cell:hover {
+        background: #f1f1ff;
+      }
+      .cell:active {
+        transform: translateY(1px);
+      }
+      .cell.x {
+        color: var(--x);
+      }
+      .cell.o {
+        color: var(--o);
+      }
+
+      #gameContainer {
+        font-family: "League Spartan", system-ui, sans-serif;
+        text-align: center;
+        padding: 22px 22px 18px;
+        position: relative;
+        isolation: isolate;
+      }
+      #cellContainer {
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        gap: 1rem;
+        width: fit-content;
+        margin: 14px auto 10px;
+      }
+      #statusText {
+        margin: 6px 0 14px;
+        color: #fff;
+        font-weight: 800;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      }
+      button {
+        font-size: 1rem;
+        padding: 0.7rem 1rem;
+        color: white;
+        background-color: #1e293b;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+        cursor: pointer;
+        transition: background 0.15s, transform 0.06s;
+      }
+      button:hover {
+        background-color: #0f172a;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+
+      /* Overlay that we inject with innerHTML */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        z-index: 50;
+        /* blur the whole page behind it */
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        background: rgba(15, 23, 42, 0.45);
+      }
+      .overlay-card {
+        background: #ffffff;
+        color: #0b1020;
+        width: min(92vw, 380px);
+        border-radius: 18px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+        padding: 26px 22px 20px;
+        text-align: center;
+      }
+      .overlay-title {
+        font-size: 32px;
+        font-weight: 900;
+        margin: 8px 0 16px;
+      }
+      .overlay .win-x {
+        color: var(--x);
+      }
+      .overlay .win-o {
+        color: var(--o);
+      }
+      .overlay .btn {
+        margin-top: 4px;
+        display: inline-block;
+        padding: 10px 16px;
+        background: #4338ca;
+        color: #fff;
+        border-radius: 12px;
+        font-weight: 700;
+      }
+      .overlay .btn:hover {
+        background: #3730a3;
+      }
+    </style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;700;800&family=Permanent+Marker&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="gameContainer">
+      <h1
+        style="
+          margin: 0;
+          color: #fff;
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        "
+      >
+        Tic Tac Toe
+      </h1>
+
+      <div id="cellContainer">
+        <div cellIndex="0" class="cell"></div>
+        <div cellIndex="1" class="cell"></div>
+        <div cellIndex="2" class="cell"></div>
+        <div cellIndex="3" class="cell"></div>
+        <div cellIndex="4" class="cell"></div>
+        <div cellIndex="5" class="cell"></div>
+        <div cellIndex="6" class="cell"></div>
+        <div cellIndex="7" class="cell"></div>
+        <div cellIndex="8" class="cell"></div>
+      </div>
+
+      <h2 id="statusText">X's turn</h2>
+      <button id="restartBtn">Restart</button>
+    </div>
+
+    <script>
+      const cells = document.querySelectorAll(".cell");
+      const statusText = document.querySelector("#statusText");
+      const restartBtn = document.querySelector("#restartBtn");
+      const winConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+      let options = ["", "", "", "", "", "", "", "", ""];
+      let currentPlayer = "X";
+      let running = false;
+
+      initializeGame();
+
+      function initializeGame() {
+        cells.forEach((cell) => cell.addEventListener("click", cellClicked));
+        restartBtn.addEventListener("click", restartGame);
+        statusText.textContent = `${currentPlayer}'s turn`;
+        running = true;
+      }
+
+      function cellClicked() {
+        const cellIndex = this.getAttribute("cellIndex");
+        if (options[cellIndex] !== "" || !running) return;
+
+        updateCell(this, cellIndex);
+        checkWinner();
+      }
+
+      function updateCell(cell, index) {
+        options[index] = currentPlayer;
+        cell.textContent = currentPlayer;
+        cell.classList.add(currentPlayer.toLowerCase());
+      }
+
+      function changePlayer() {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = `${currentPlayer}'s turn`;
+      }
+
+      function checkWinner() {
+        let roundWon = false;
+
+        for (let i = 0; i < winConditions.length; i++) {
+          const [a, b, c] = winConditions[i];
+          const A = options[a],
+            B = options[b],
+            C = options[c];
+          if (!A || !B || !C) continue;
+          if (A === B && B === C) {
+            roundWon = true;
+            break;
+          }
+        }
+
+        if (roundWon) {
+          running = false;
+          statusText.textContent = `${currentPlayer} wins!`;
+          showOverlay(`${currentPlayer}`); // show blur + winner
+        } else if (!options.includes("")) {
+          running = false;
+          statusText.textContent = `Draw!`;
+          showOverlay("Draw"); // blur + draw
+        } else {
+          changePlayer();
+        }
+      }
+
+      function restartGame() {
+        // remove overlay if present
+        const overlay = document.querySelector(".overlay");
+        if (overlay) overlay.remove();
+
+        currentPlayer = "X";
+        options = ["", "", "", "", "", "", "", "", ""];
+        statusText.textContent = `${currentPlayer}'s turn`;
+        cells.forEach((cell) => {
+          cell.textContent = "";
+          cell.classList.remove("x", "o");
+        });
+        running = true;
+      }
+
+      // Creates the blur overlay using innerHTML
+      function showOverlay(who) {
+        const overlay = document.createElement("div");
+        overlay.className = "overlay";
+        const title =
+          who === "Draw"
+            ? "✌️Draw Game"
+            : `<span class="${
+                who === "X" ? "win-x" : "win-o"
+              }">🎉'${who}'</span> Wins`;
+        overlay.innerHTML = `
+          <div class="overlay-card">
+            <div class="overlay-title my-5">${title}</div>
+            <button class="btn" id="newGameBtn">New Game</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        // Wire the New Game button
+        overlay
+          .querySelector("#newGameBtn")
+          .addEventListener("click", restartGame);
+        // Optional: close on overlay click (outside card)
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) restartGame();
+        });
+      }
+    </script>
+  </body>
+</html>
