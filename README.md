@@ -22,6 +22,7 @@ A simple, polished Tic‑Tac‑Toe for two players. It uses vanilla JavaScript, 
 No build tools required.
 
 ## File Structure
-.
+```
 ├── index.html # Single‑file app (HTML, CSS, JS)
 └── README.md
+```
