@@ -2,6 +2,8 @@
 
 A simple, polished Tic‑Tac‑Toe for two players. It uses vanilla JavaScript, rounded white tiles, colored X/O marks, and a blurred overlay that announces the result with a “New Game” button. The game logic is intentionally minimal and beginner‑friendly.
 
+Live Preview: [https://sayeedmunees.github.io/tic-tac-toe/] 
+
 ## Demo
 - Click any empty tile to place a mark.
 - X starts first; turns alternate automatically.
