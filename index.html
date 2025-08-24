@@ -92,14 +92,12 @@
         transform: translateY(1px);
       }
 
-      /* Overlay that we inject with innerHTML */
       .overlay {
         position: fixed;
         inset: 0;
         display: grid;
         place-items: center;
-        z-index: 50;
-        /* blur the whole page behind it */
+        z-index: 10;
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
         background: rgba(15, 23, 42, 0.45);
