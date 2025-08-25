@@ -235,18 +235,18 @@
         if (roundWon) {
           running = false;
           statusText.textContent = `${currentPlayer} wins!`;
-          showOverlay(`${currentPlayer}`); // show blur + winner
+          showOverlay(`${currentPlayer}`);
         } else if (!options.includes("")) {
           running = false;
           statusText.textContent = `Draw!`;
-          showOverlay("Draw"); // blur + draw
+          showOverlay("Draw");
         } else {
           changePlayer();
         }
       }
 
       function restartGame() {
-        // remove overlay if present
+
         const overlay = document.querySelector(".overlay");
         if (overlay) overlay.remove();
 
@@ -260,7 +260,7 @@
         running = true;
       }
 
-      // Creates the blur overlay using innerHTML
+
       function showOverlay(who) {
         const overlay = document.createElement("div");
         overlay.className = "overlay";
@@ -277,11 +277,11 @@
           </div>
         `;
         document.body.appendChild(overlay);
-        // Wire the New Game button
+
         overlay
           .querySelector("#newGameBtn")
           .addEventListener("click", restartGame);
-        // Optional: close on overlay click (outside card)
+`
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) restartGame();
         });
