@@ -13,7 +13,6 @@
         --o: #06b6d4;
       }
 
-
       body {
         margin: 0;
         min-height: 100vh;
@@ -246,7 +245,6 @@
       }
 
       function restartGame() {
-
         const overlay = document.querySelector(".overlay");
         if (overlay) overlay.remove();
 
@@ -259,7 +257,6 @@
         });
         running = true;
       }
-
 
       function showOverlay(who) {
         const overlay = document.createElement("div");
@@ -281,7 +278,7 @@
         overlay
           .querySelector("#newGameBtn")
           .addEventListener("click", restartGame);
-`
+
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) restartGame();
         });
